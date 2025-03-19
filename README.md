@@ -26,8 +26,8 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone [https://github.com/edemkaaa/testNodeJs.git]
-cd [TestZ]
+git clone https://github.com/edemkaaa/testNodeJs.git
+cd TestZ
 ```
 
 2. Установите зависимости:
@@ -67,4 +67,4 @@ http://localhost:3000/api
 - NEW - Новое
 - IN_PROGRESS - В работе
 - COMPLETED - Завершено
-- CANCELLED - Отменено 
+- CANCELLED - Отменено
