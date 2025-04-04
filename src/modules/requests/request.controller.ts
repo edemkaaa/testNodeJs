@@ -1,16 +1,16 @@
 import { Controller, Post, Put, Get, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
-import { RequestService } from '../services/request.service';
-import { CancelRequestDto, CompleteRequestDto, CreateRequestDto, FilterRequestsDto } from 'src/dto/request.dto';
-import { Request } from '../entities/request.entity';
+import { RequestService } from './request.service';
+import { CancelRequestDto, CompleteRequestDto, CreateRequestDto, FilterRequestsDto } from 'src/modules/requests/dto/request.dto';
+import { Request } from './entities/request.entity';
 
-@ApiTags('requests')
-@Controller('requests')
+@ApiTags('Requests')
+@Controller('api/v1/requests')
 export class RequestController {
   constructor(private readonly requestService: RequestService) {}
 
   @ApiOperation({ summary: 'Создать новое обращение' })
-  @ApiResponse({ status: 201, description: 'Обращение успешно создано', type: Request })
+  @ApiResponse({ status: 200, description: 'Обращение успешно создано', type: Request })
   @ApiBody({ type: CreateRequestDto })
   @Post()
   create(@Body() createRequestDto: CreateRequestDto) {

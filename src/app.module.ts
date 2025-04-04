@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RequestModule } from './modules/request.module';
-import { Request } from './entities/request.entity';
-
+import { Request } from './modules/requests/entities/request.entity';
+import { RequestModule } from './modules/requests/request.module';
+import { User } from './modules/users/entities/user.entity';
+import { UserModule } from './modules/users/user.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LoggerModule } from './logger/logger.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -12,10 +15,12 @@ import { Request } from './entities/request.entity';
       username: 'edem',
       password: '',
       database: 'request_system',
-      entities: [Request],
+      entities: [Request, User],
       synchronize: true,
     }),
+    LoggerModule,
     RequestModule,
+    UserModule,
   ],
 })
 export class AppModule {} 

@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, Equal } from 'typeorm';
-import { Request } from '../entities/request.entity';
-import { RequestStatus } from '../enums/request-status.enum';
-import { CreateRequestDto, CompleteRequestDto, CancelRequestDto, FilterRequestsDto } from '../dto/request.dto';
+import { Request } from './entities/request.entity';
+import { RequestStatus } from './enums/request-status.enum';
+import { CreateRequestDto, CompleteRequestDto, CancelRequestDto, FilterRequestsDto } from './dto/request.dto';
 
 @Injectable()
 export class RequestService {

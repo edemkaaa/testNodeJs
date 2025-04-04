@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeor
 import { RequestStatus } from '../enums/request-status.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
-@Entity('requests')
+@Entity('api/v1/requests')
 export class Request {
   @ApiProperty({ description: 'Уникальный идентификатор обращения', example: 1 })
   @PrimaryGeneratedColumn()
