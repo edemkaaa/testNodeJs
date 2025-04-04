@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsDate } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsDateString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateRequestDto {
@@ -28,18 +28,18 @@ export class CancelRequestDto {
 }
 
 export class FilterRequestsDto {
-  @ApiProperty({ description: 'Начальная дата диапазона', required: false, type: Date })
+  @ApiProperty({ description: 'Конкретная дата для фильтрации (YYYY-MM-DD)', required: false, example: '2023-10-15' })
   @IsOptional()
-  @IsDate()
-  startDate?: Date;
+  @IsDateString()
+  date?: string;
 
-  @ApiProperty({ description: 'Конечная дата диапазона', required: false, type: Date })
+  @ApiProperty({ description: 'Начальная дата диапазона (YYYY-MM-DD)', required: false, example: '2023-10-01' })
   @IsOptional()
-  @IsDate()
-  endDate?: Date;
+  @IsDateString()
+  startDate?: string;
 
-  @ApiProperty({ description: 'Конкретная дата для фильтрации', required: false, type: Date })
+  @ApiProperty({ description: 'Конечная дата диапазона (YYYY-MM-DD)', required: false, example: '2023-10-31' })
   @IsOptional()
-  @IsDate()
-  date?: Date;
+  @IsDateString()
+  endDate?: string;
 } 

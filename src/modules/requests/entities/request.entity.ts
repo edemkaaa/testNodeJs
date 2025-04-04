@@ -44,10 +44,7 @@ export class Request {
   @Column({ nullable: true })
   cancellationReason?: string;
 
-  @ApiProperty({ 
-    description: 'Дата создания обращения', 
-    example: '2023-05-20T14:45:30Z' 
-  })
+  @ApiProperty({ description: 'Дата создания обращения' })
   @CreateDateColumn()
   createdAt: Date;
 } 

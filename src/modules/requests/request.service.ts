@@ -1,12 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, Equal } from 'typeorm';
+import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { Request } from './entities/request.entity';
 import { RequestStatus } from './enums/request-status.enum';
 import { CreateRequestDto, CompleteRequestDto, CancelRequestDto, FilterRequestsDto } from './dto/request.dto';
 
 @Injectable()
 export class RequestService {
+  private readonly logger = new Logger(RequestService.name);
+
   constructor(
     @InjectRepository(Request)
     private requestRepository: Repository<Request>
@@ -50,15 +52,56 @@ export class RequestService {
     );
   }
 
-  async filter(filterDto: FilterRequestsDto): Promise<Request[]> {
-    const where: any = {};
+  async findAll(filterDto: FilterRequestsDto): Promise<Request[]> {
+    this.logger.log(`Получение списка обращений с фильтрами: ${JSON.stringify(filterDto)}`);
     
+    const queryBuilder = this.requestRepository.createQueryBuilder('request');
+    
+    // Применяем фильтры по датам
     if (filterDto.date) {
-      where.createdAt = Equal(filterDto.date);
-    } else if (filterDto.startDate && filterDto.endDate) {
-      where.createdAt = Between(filterDto.startDate, filterDto.endDate);
+      const date = new Date(filterDto.date);
+      const nextDay = new Date(date);
+      nextDay.setDate(date.getDate() + 1);
+      
+      queryBuilder.andWhere(
+        'request.createdAt >= :date AND request.createdAt < :nextDay',
+        { date, nextDay }
+      );
+      
+      this.logger.log(`Применен фильтр по конкретной дате: ${filterDto.date}`);
     }
     
-    return this.requestRepository.find({ where });
+    if (filterDto.startDate && filterDto.endDate) {
+      const startDate = new Date(filterDto.startDate);
+      const endDate = new Date(filterDto.endDate);
+      endDate.setDate(endDate.getDate() + 1);
+      
+      queryBuilder.andWhere(
+        'request.createdAt >= :startDate AND request.createdAt < :endDate',
+        { startDate, endDate }
+      );
+      
+      this.logger.log(`Применен фильтр по диапазону дат: ${filterDto.startDate} - ${filterDto.endDate}`);
+    } else if (filterDto.startDate) {
+      const startDate = new Date(filterDto.startDate);
+      
+      queryBuilder.andWhere('request.createdAt >= :startDate', { startDate });
+      this.logger.log(`Применен фильтр по начальной дате: ${filterDto.startDate}`);
+    } else if (filterDto.endDate) {
+      const endDate = new Date(filterDto.endDate);
+      endDate.setDate(endDate.getDate() + 1); 
+      
+      queryBuilder.andWhere('request.createdAt < :endDate', { endDate });
+      this.logger.log(`Применен фильтр по конечной дате: ${filterDto.endDate}`);
+    }
+    
+    try {
+      const requests = await queryBuilder.getMany();
+      this.logger.log(`Найдено ${requests.length} обращений`);
+      return requests;
+    } catch (error) {
+      this.logger.error(`Ошибка при получении списка обращений: ${error.message}`, error.stack);
+      throw error;
+    }
   }
 } 

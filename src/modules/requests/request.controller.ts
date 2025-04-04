@@ -1,12 +1,16 @@
-import { Controller, Post, Put, Get, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Controller, Post, Put, Get, Body, Param, Query, Logger, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { RequestService } from './request.service';
-import { CancelRequestDto, CompleteRequestDto, CreateRequestDto, FilterRequestsDto } from 'src/modules/requests/dto/request.dto';
+import { CancelRequestDto, CompleteRequestDto, CreateRequestDto, FilterRequestsDto } from './dto/request.dto';
 import { Request } from './entities/request.entity';
+
 
 @ApiTags('Requests')
 @Controller('api/v1/requests')
+@UseInterceptors(ClassSerializerInterceptor)
 export class RequestController {
+  private readonly logger = new Logger(RequestController.name);
+
   constructor(private readonly requestService: RequestService) {}
 
   @ApiOperation({ summary: 'Создать новое обращение' })
@@ -56,10 +60,18 @@ export class RequestController {
     return this.requestService.cancelAllInProgress();
   }
 
-  @ApiOperation({ summary: 'Получить список обращений' })
-  @ApiResponse({ status: 200, description: 'Список обращений', type: [Request] })
+  @ApiOperation({ summary: 'Получить список обращений с возможностью фильтрации по датам' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Список обращений успешно получен',
+    type: [Request]
+  })
+  @ApiQuery({ name: 'date', required: false, type: String, description: 'Конкретная дата (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Начальная дата диапазона (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'endDate', required: false, type: String, description: 'Конечная дата диапазона (YYYY-MM-DD)' })
   @Get()
-  filter(@Query() filterDto: FilterRequestsDto) {
-    return this.requestService.filter(filterDto);
+  async findAll(@Query() filterDto: FilterRequestsDto): Promise<Request[]> {
+    this.logger.log(`Запрос на получение списка обращений с фильтрами: ${JSON.stringify(filterDto)}`);
+    return this.requestService.findAll(filterDto);
   }
 } 
